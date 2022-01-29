@@ -1,7 +1,7 @@
-from os import rename
+import os
 from os.path import getsize, abspath
 from hashlib import sha256
-from typing import Iterator
+from typing import Generator
 
 
 class FileManager:
@@ -9,6 +9,7 @@ class FileManager:
     def posterize_file(path: str) -> str:
         filename = path.split('/')[-1]
         size = getsize(path)
+        chunk_size = min(int(size / 10), 1048576) or 1
         file_hash = sha256()
 
         with open(f'./known_files/{filename}.ftl.temp', 'w') as known_file:
@@ -17,25 +18,42 @@ class FileManager:
                 str(size) + '\n',
             ])
 
-            for chunk in FileReader.read(path):
+            for chunk in FileReader.read(path, chunk_size):
                 known_file.write(sha256(chunk).hexdigest() + '\n')
                 file_hash.update(chunk)
 
             known_file.write(file_hash.hexdigest() + '\n')
 
         file_hash = file_hash.hexdigest()
-        rename(f'./known_files/{filename}.ftl.temp', f'./known_files/{file_hash}.ftl')
+        os.rename(f'./known_files/{filename}.ftl.temp', f'./known_files/{file_hash}.ftl')
 
         return file_hash
+
+    @staticmethod
+    def get_known_files() -> Generator[str, None, None]:
+        for file in os.listdir('known_files'):
+            filename, extension = file.split('.')
+            if extension == 'ftl':
+                yield filename
 
 
 class FileReader:
     @staticmethod
-    def read(path: str) -> Iterator[bytes]:
+    def read(path: str, chunk_size: int) -> Generator[bytes, None, None]:
         with open(path, 'rb') as file:
             while True:
-                chunk: bytes = file.read(1048576)
+                chunk: bytes = file.read(chunk_size)
                 if not chunk:
                     break
 
                 yield chunk
+
+    @staticmethod
+    def read_lines(path: str) -> Generator[str, None, None]:
+        with open(path, 'r') as file:
+            while True:
+                line: str = file.readline().strip()
+                if not line:
+                    break
+
+                yield line
