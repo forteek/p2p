@@ -1,16 +1,23 @@
 from message import MessageEvent, Message
 from file_utils import FileReader, FileWriter, ChunkSizeCalculator
 from networking import Peer, Socket
+from time import sleep
 
 
 class FileStream:
-    def __init__(self):
+    def __init__(self, peer: Peer):
         self._socket = Socket()
+        self._peer = peer
+
+    def _punch_hole(self):
+        self._socket.write_raw(b'111', self._peer)
+        data, addr = self._socket.read_raw(1024)
+        print(data)
 
 
 class OutboundFileStream(FileStream):
-    def __init__(self, file_hash: str):
-        super().__init__()
+    def __init__(self, file_hash: str, peer: Peer):
+        super().__init__(peer)
         self._file_hash = file_hash
         self._poster_path = f'./known_files/{file_hash}.ftl'
         self._file_path = self._get_file_path()
@@ -23,32 +30,33 @@ class OutboundFileStream(FileStream):
 
         return file_path
 
-    def send(self, peer: Peer):
+    def send(self):
         print(f'Sending {self._file_hash}')
+
+        self._punch_hole()
 
         self._socket.write(
             Message(MessageEvent.CHUNK_SIZE, self._chunk_size),
-            peer
+            self._peer
         )
 
         for chunk in FileReader.read(self._file_path, self._chunk_size):
-            self._socket.write_raw(chunk, peer)
+            self._socket.write_raw(chunk, self._peer)
 
-        self._socket.write_raw(b'000', peer)
+        self._socket.write_raw(b'000', self._peer)
         print(f'{self._file_hash} sent')
 
 
 class InboundFileStream(FileStream):
     def __init__(self, file_hash: str, file_path: str, peer: Peer):
-        super().__init__()
+        super().__init__(peer)
         self._file_hash = file_hash
         self._file_path = file_path
         self._chunk_size = None
-        self._peer = peer
 
     def receive(self):
         print(f'Receiving {self._file_path}')
-        self._socket.write_raw(b'0', self._peer)
+        self._punch_hole()
         chunk_size: int = self._await_chunk_size()
 
         while True:

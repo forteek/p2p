@@ -26,20 +26,23 @@ class Socket(Singleton):
 
     def read(self, size: int) -> Tuple[Message, Peer]:
         message, addr = self._socket.recvfrom(size)
+        print(f'Received {message} from {addr}')
         message = MessageSerializer.deserialize(message)
 
         return message, Peer(addr[0], addr[1])
 
     def read_raw(self, size: int) -> Tuple[bytes, Peer]:
         message, addr = self._socket.recvfrom(size)
+        print(f'Received {message} from {addr}')
 
         return message, Peer(addr[0], addr[1])
 
     def write(self, message: Message, peer: Peer) -> None:
-        self._socket.sendto(MessageSerializer.serialize(message), peer)
+        self.write_raw(MessageSerializer.serialize(message), peer)
 
     def write_raw(self, content: bytes, peer: Peer) -> None:
         self._socket.sendto(content, peer)
+        print(f'Sent {content} to {peer}')
 
 
 class TrackerManager(Singleton):

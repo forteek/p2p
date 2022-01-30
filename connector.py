@@ -38,7 +38,7 @@ class Connector:
                 if file_hash not in FileManager.get_known_files():
                     continue
 
-                OutboundFileStream(file_hash).send(peer)
+                OutboundFileStream(file_hash, peer).send()
 
     @staticmethod
     def get(file_hash: str):
