@@ -6,6 +6,7 @@ class MessageEvent(Enum):
     HAS = 'has'
     NEED = 'need'
     CHUNK_SIZE = 'chunk_size'
+    LISTEN_ON = 'listen_on'
 
 
 class Message:

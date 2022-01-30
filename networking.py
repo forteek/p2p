@@ -21,6 +21,9 @@ class Socket(Singleton):
     def keep_alive(self, peer: Peer) -> None:
         self.ping(peer)
 
+    def bind(self, address: Peer) -> None:
+        self._socket.bind(address)
+
     def read(self, size: int) -> Tuple[Message, Peer]:
         message, addr = self._socket.recvfrom(size)
         message = MessageSerializer.deserialize(message)

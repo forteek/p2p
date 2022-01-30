@@ -1,15 +1,20 @@
-from message import MessageEvent
+from message import MessageEvent, Message
 from file_utils import FileReader, FileWriter, ChunkSizeCalculator
 from networking import Peer, Socket
 
 
-class OutboundFileStream:
+class FileStream:
+    def __init__(self):
+        self._socket = Socket()
+
+
+class OutboundFileStream(FileStream):
     def __init__(self, file_hash: str):
+        super().__init__()
         self._file_hash = file_hash
         self._poster_path = f'./known_files/{file_hash}.ftl'
         self._file_path = self._get_file_path()
         self._chunk_size = ChunkSizeCalculator.calculate(self._file_path)
-        self._socket = Socket()
 
     def _get_file_path(self) -> str:
         line_generator = FileReader.read_lines(self._poster_path)
@@ -21,6 +26,11 @@ class OutboundFileStream:
     def send(self, peer: Peer):
         print(f'Sending {self._file_hash}')
 
+        self._socket.write(
+            Message(MessageEvent.CHUNK_SIZE, self._chunk_size),
+            peer
+        )
+
         for chunk in FileReader.read(self._file_path, self._chunk_size):
             self._socket.write_raw(chunk, peer)
 
@@ -28,16 +38,17 @@ class OutboundFileStream:
         print(f'{self._file_hash} sent')
 
 
-class InboundFileStream:
+class InboundFileStream(FileStream):
     def __init__(self, file_hash: str, file_path: str, peer: Peer):
+        super().__init__()
         self._file_hash = file_hash
         self._file_path = file_path
         self._chunk_size = None
-        self._socket = Socket()
         self._peer = peer
 
     def receive(self):
         print(f'Receiving {self._file_path}')
+        self._socket.bind(self._peer)
         chunk_size: int = self._await_chunk_size()
 
         while True:
