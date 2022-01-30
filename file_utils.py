@@ -9,7 +9,7 @@ class FileManager:
     def posterize_file(path: str) -> str:
         filename = path.split('/')[-1]
         size = getsize(path)
-        chunk_size = min(int(size / 10), 1048576) or 1
+        chunk_size = ChunkSizeCalculator.calculate(path)
         file_hash = sha256()
 
         with open(f'./known_files/{filename}.ftl.temp', 'w') as known_file:
@@ -57,3 +57,18 @@ class FileReader:
                     break
 
                 yield line
+
+
+class FileWriter:
+    @staticmethod
+    def write(path: str, content: bytes):
+        with open(path, 'ab') as file:
+            file.write(content)
+
+
+class ChunkSizeCalculator:
+    @staticmethod
+    def calculate(filepath: str):
+        size = getsize(filepath)
+
+        return min(int(size / 10), 1048576) or 1

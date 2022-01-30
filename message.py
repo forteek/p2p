@@ -5,6 +5,7 @@ import json
 class MessageEvent(Enum):
     HAS = 'has'
     NEED = 'need'
+    CHUNK_SIZE = 'chunk_size'
 
 
 class Message:
@@ -23,6 +24,6 @@ class MessageSerializer:
         data = json.loads(message.decode('utf-8'))
 
         return Message(
-            MessageEvent[data['event']],
+            MessageEvent[data['event'].upper()],
             data['content']
         )
