@@ -48,7 +48,7 @@ class InboundFileStream(FileStream):
 
     def receive(self):
         print(f'Receiving {self._file_path}')
-        self._socket.bind(self._peer)
+        self._socket.write_raw(b'0', self._peer)
         chunk_size: int = self._await_chunk_size()
 
         while True:

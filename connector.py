@@ -54,15 +54,15 @@ class Connector:
         while True:
             data, server_addr = sock.read(1024)
 
-            if data.event == MessageEvent.LISTEN_ON:
-                host, port = data.content.split(':')
-                address = Peer(host, int(port))
-
-                InboundFileStream(file_hash, f'./{file_hash}', address).receive()
-
-            # if data.event == MessageEvent.HAS:
-            #     peer, file_hash = data.content.split('|')
-            #     host, port = peer.split(':')
-            #     peer = Peer(host, int(port))
+            # if data.event == MessageEvent.LISTEN_ON:
+            #     host, port = data.content.split(':')
+            #     address = Peer(host, int(port))
             #
-            #     InboundFileStream(file_hash, f'./{file_hash}', peer).receive()
+            #     InboundFileStream(file_hash, f'./{file_hash}', address).receive()
+
+            if data.event == MessageEvent.HAS:
+                peer, file_hash = data.content.split('|')
+                host, port = peer.split(':')
+                peer = Peer(host, int(port))
+
+                InboundFileStream(file_hash, f'./{file_hash}', peer).receive()
