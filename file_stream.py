@@ -1,7 +1,9 @@
+import socket
+
 from message import MessageEvent, Message
 from file_utils import FileReader, FileWriter, ChunkSizeCalculator
 from networking import Peer, Socket
-from time import sleep
+from socket import timeout
 
 
 class FileStream:
@@ -10,9 +12,16 @@ class FileStream:
         self._peer = peer
 
     def _punch_hole(self):
-        self._socket.write_raw(b'111', self._peer)
-        data, addr = self._socket.read_raw(1024)
-        print(data)
+        while True:
+            try:
+                self._socket.write_raw(b'111', self._peer)
+                self._socket.set_timeout(3)
+                data, addr = self._socket.read_raw(1024)
+            except socket.timeout:
+                print('Connection failed, retrying')
+                continue
+            finally:
+                print(data)
 
 
 class OutboundFileStream(FileStream):

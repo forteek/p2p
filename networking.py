@@ -24,6 +24,9 @@ class Socket(Singleton):
     def bind(self, address: Peer) -> None:
         self._socket.bind(address)
 
+    def set_timeout(self, time: int) -> None:
+        self._socket.settimeout(time)
+
     def read(self, size: int) -> Tuple[Message, Peer]:
         message, addr = self._socket.recvfrom(size)
         print(f'Received {message} from {addr}')
