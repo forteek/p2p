@@ -20,8 +20,9 @@ class FileStream:
             except socket.timeout:
                 print('Connection failed, retrying')
                 continue
-            finally:
-                print(data)
+
+            print(data)
+            break
 
 
 class OutboundFileStream(FileStream):
