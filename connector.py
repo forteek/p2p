@@ -26,10 +26,14 @@ class Connector:
                 )
 
         while True:
-            data, peer = sock.read(1024)
+            data, server_addr = sock.read(1024)
 
             if data.event == MessageEvent.NEED:
-                file_hash = data.content
+                peer, file_hash = data.content.split('|')
+                host, port = peer.split(':')
+                peer = Peer(host, port)
+
+                print(f'{peer} needs {data.content}')
 
                 if file_hash not in FileManager.get_known_files():
                     continue
@@ -48,9 +52,11 @@ class Connector:
             )
 
         while True:
-            data, peer = sock.read(1024)
+            data, server_addr = sock.read(1024)
 
             if data.event == MessageEvent.HAS:
-                file_hash = data.content
+                peer, file_hash = data.content.split('|')
+                host, port = peer.split(':')
+                peer = Peer(host, port)
 
-                InboundFileStream(file_hash, f'./{file_hash}').receive()
+                InboundFileStream(file_hash, f'./{file_hash}', peer).receive()

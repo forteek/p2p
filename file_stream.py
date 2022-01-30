@@ -29,11 +29,12 @@ class OutboundFileStream:
 
 
 class InboundFileStream:
-    def __init__(self, file_hash: str, file_path: str):
+    def __init__(self, file_hash: str, file_path: str, peer: Peer):
         self._file_hash = file_hash
         self._file_path = file_path
         self._chunk_size = None
         self._socket = Socket()
+        self._peer = peer
 
     def receive(self):
         print(f'Receiving {self._file_path}')
