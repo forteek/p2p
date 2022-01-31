@@ -22,7 +22,6 @@ class FileStream:
                 print(f'Connection failed, retrying {self._socket._socket.getsockname()}')
                 continue
 
-            self._socket.set_timeout(0)
             print(data)
             break
 
