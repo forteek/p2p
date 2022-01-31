@@ -17,7 +17,7 @@ class FileStream:
             try:
                 self._socket.write_raw(b'0', self._peer)
                 self._socket.set_timeout(3)
-                data, addr = self._socket.read_raw(1)
+                data, addr = self._socket.read_raw(1024)
             except socket.timeout:
                 print(f'Connection failed, retrying {self._socket._socket.getsockname()}')
                 continue
