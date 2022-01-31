@@ -3,7 +3,8 @@ import socket
 from message import MessageEvent, Message
 from file_utils import FileReader, FileWriter, ChunkSizeCalculator
 from networking import Peer, Socket
-from socket import timeout
+import socket
+from time import sleep
 
 
 class FileStream:
