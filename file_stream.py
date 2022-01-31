@@ -15,9 +15,9 @@ class FileStream:
     def _punch_hole(self):
         while True:
             try:
-                self._socket.write_raw(b'111', self._peer)
+                self._socket.write_raw(b'0', self._peer)
                 self._socket.set_timeout(3)
-                data, addr = self._socket.read_raw(1024)
+                data, addr = self._socket.read_raw(1)
             except socket.timeout:
                 print('Connection failed, retrying')
                 continue
