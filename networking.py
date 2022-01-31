@@ -14,7 +14,6 @@ class Peer(NamedTuple):
 class Socket(Singleton):
     def __init__(self):
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self._socket.bind(('0.0.0.0', 62012))
 
     def ping(self, peer: Peer) -> None:
         self._socket.sendto(b'0', peer)
