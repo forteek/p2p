@@ -19,9 +19,10 @@ class FileStream:
                 self._socket.set_timeout(3)
                 data, addr = self._socket.read_raw(1)
             except socket.timeout:
-                print('Connection failed, retrying')
+                print(f'Connection failed, retrying {self._socket._socket.getsockname()}')
                 continue
 
+            self._socket.set_timeout(0)
             print(data)
             break
 
