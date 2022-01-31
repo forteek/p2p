@@ -31,6 +31,7 @@ class Connector:
             if data.event == MessageEvent.NEED:
                 peer, file_hash = data.content.split('|')
                 host, port = peer.split(':')
+                port = 62010
                 peer = Peer(host, int(port))
 
                 print(f'{peer} needs {data.content}')
@@ -63,6 +64,7 @@ class Connector:
             if data.event == MessageEvent.HAS:
                 peer, file_hash = data.content.split('|')
                 host, port = peer.split(':')
+                port = 62010
                 peer = Peer(host, int(port))
 
                 InboundFileStream(file_hash, f'./{file_hash}', peer).receive()
